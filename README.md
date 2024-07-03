@@ -20,9 +20,10 @@ that all of the code is precompiled. Feel free to adjust the precompile script
 to your usecase, for example comment out the Gurobi configuration if you do not
 have a Gurobi license.
 
-Afterwards, call the tool as follows:
+Afterwards, call the tool as either of the following two lines:
 ```bash
 julia --project -JMoaMopb.so -e "using MoaMopb; MoaMopb.main()" <ARGS>
+julia --project -JMoaMopb.so -- run.jl <ARGS>
 ```
 
 ## Arguments
