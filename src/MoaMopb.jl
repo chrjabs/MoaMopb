@@ -207,6 +207,8 @@ function main()
             print_sol = true
         elseif x == "--non-silent"
             silent = false
+        else
+            @warn "Unknown option" x
         end
     end
 
