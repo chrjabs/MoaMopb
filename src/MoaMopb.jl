@@ -187,6 +187,12 @@ function main()
             alg = MOA.EpsilonConstraint()
         elseif x == "--hierarchical"
             alg = MOA.Hierarchical()
+        elseif x == "--tamby-vanderpooten"
+            alg = MOA.TambyVanderpooten()
+        elseif x == "--kirlik-sayin"
+            alg = MOA.KirlikSayin()
+        elseif x == "--dominguez-rios"
+            alg = MOA.DominguezRios()
         elseif x == "--highs"
             opt = HiGHS.Optimizer
         elseif x == "--scip"
