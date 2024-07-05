@@ -5,6 +5,7 @@ using Printf
 import HiGHS
 import SCIP
 import Gurobi
+import CPLEX
 
 import MathOptInterface as MOI
 import MultiObjectiveAlgorithms as MOA
@@ -63,11 +64,18 @@ function run(
     print_sol::Bool,
     print_model::Bool,
     silent::Bool,
+    threads::Union{Int,Nothing},
 )
     model = MOA.Optimizer(opt)
     MOI.set(model, MOI.Silent(), silent)
     MOI.set(model, MOA.Algorithm(), alg)
     MOI.set(model, MOI.TimeLimitSec(), tlim)
+    if opt == SCIP.Optimizer
+        MOI.set(model, MOI.RawOptimizerAttribute("lp/threads"), threads)
+        MOI.set(model, MOI.RawOptimizerAttribute("parallel/maxnthreads"), threads)
+    else
+        MOI.set(model, MOI.NumberOfThreads(), threads)
+    end
 
     println(
         "===[ Solver Info ]==============================================================",
@@ -78,7 +86,8 @@ function run(
         MOI.get(model, MOI.SolverVersion()),
         ")",
     )
-    println("Time limit: ", MOI.get(model, MOI.TimeLimitSec()), "s")
+    println("Time limit: ", tlim, "s")
+    println("Threads: ", threads)
 
     file = open(path, "r")
 
@@ -173,6 +182,7 @@ function main()
     print_sol = false
     silent = true
     tlim = nothing
+    threads = nothing
 
     alg = MOA.Lexicographic()
     opt = HiGHS.Optimizer
@@ -199,6 +209,8 @@ function main()
             opt = SCIP.Optimizer
         elseif x == "--gurobi"
             opt = Gurobi.Optimizer
+        elseif x == "--cplex"
+            opt = CPLEX.Optimizer
         elseif startswith(x, "--timelimit=")
             tlim = parse(Int, x[13:length(x)])
         elseif x == "--print-model"
@@ -207,6 +219,8 @@ function main()
             print_sol = true
         elseif x == "--non-silent"
             silent = false
+        elseif startswith(x, "--threads=")
+            threads = parse(Int, split(x, "=")[2])
         else
             @warn "Unknown option" x
         end
@@ -215,7 +229,7 @@ function main()
     if isempty(ARGS)
         @warn "No instance file provided, exiting"
     else
-        run(ARGS[length(ARGS)], opt, alg, tlim, print_sol, print_model, silent)
+        run(ARGS[length(ARGS)], opt, alg, tlim, print_sol, print_model, silent, threads)
     end
 end
 
