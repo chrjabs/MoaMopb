@@ -70,11 +70,13 @@ function run(
     MOI.set(model, MOI.Silent(), silent)
     MOI.set(model, MOA.Algorithm(), alg)
     MOI.set(model, MOI.TimeLimitSec(), tlim)
-    if opt == SCIP.Optimizer
-        MOI.set(model, MOI.RawOptimizerAttribute("lp/threads"), threads)
-        MOI.set(model, MOI.RawOptimizerAttribute("parallel/maxnthreads"), threads)
-    else
-        MOI.set(model, MOI.NumberOfThreads(), threads)
+    if !isnothing(threads)
+        if opt == SCIP.Optimizer
+            MOI.set(model, MOI.RawOptimizerAttribute("lp/threads"), threads)
+            MOI.set(model, MOI.RawOptimizerAttribute("parallel/maxnthreads"), threads)
+        else
+            MOI.set(model, MOI.NumberOfThreads(), threads)
+        end
     end
 
     println(
