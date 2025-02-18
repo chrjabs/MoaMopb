@@ -65,11 +65,21 @@ function run(
     print_model::Bool,
     silent::Bool,
     threads::Union{Int,Nothing},
+    tuned::Bool,
 )
     model = MOA.Optimizer(opt)
     MOI.set(model, MOI.Silent(), silent)
     MOI.set(model, MOA.Algorithm(), alg)
     MOI.set(model, MOI.TimeLimitSec(), tlim)
+    if tuned
+        MOI.set(model, MOI.AbsoluteGapTolerance(), 1e-6)
+        MOI.set(model, MOI.RelativeGapTolerance(), 0.0)
+        if opt == CPLEX.Optimizer
+            MOI.set(model, MOI.RawOptimizerAttribute("CPXPARAM_MIP_Tolerances_Integrality"), 1e-8)
+        elseif opt == HiGHS.Optimizer
+            MOI.set(model, MOI.RawOptimizerAttribute("mip_feasibility_tolerance"), 1e-8)
+        end
+    end
     if !isnothing(threads)
         if opt == SCIP.Optimizer
             MOI.set(model, MOI.RawOptimizerAttribute("lp/threads"), threads)
@@ -90,6 +100,7 @@ function run(
     )
     println("Time limit: ", tlim, "s")
     println("Threads: ", threads)
+    println("Tuned: ", tuned)
 
     file = open(path, "r")
 
@@ -155,7 +166,13 @@ function run(
         print("o")
         objvals = MOI.get(model, MOI.ObjectiveValue(i))
         for j in eachindex(objvals)
-            print(" ", trunc(Int, objvals[j]))
+            print(" ", round(Int, objvals[j]))
+        end
+        println()
+        print("f")
+        objvals = MOI.get(model, MOI.ObjectiveValue(i))
+        for j in eachindex(objvals)
+            print(" ", objvals[j])
         end
         println()
         if print_sol
@@ -185,6 +202,7 @@ function main()
     silent = true
     tlim = nothing
     threads = nothing
+    tuned = false
 
     alg = MOA.Lexicographic()
     opt = HiGHS.Optimizer
@@ -223,6 +241,8 @@ function main()
             silent = false
         elseif startswith(x, "--threads=")
             threads = parse(Int, split(x, "=")[2])
+        elseif x == "--tuned"
+            tuned = true
         else
             @warn "Unknown option" x
         end
@@ -231,7 +251,7 @@ function main()
     if isempty(ARGS)
         @warn "No instance file provided, exiting"
     else
-        run(ARGS[length(ARGS)], opt, alg, tlim, print_sol, print_model, silent, threads)
+        run(ARGS[length(ARGS)], opt, alg, tlim, print_sol, print_model, silent, threads, tuned)
     end
 end
 
