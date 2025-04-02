@@ -28,16 +28,18 @@ julia --project -JMoaMopb.so -- run.jl <ARGS>
 
 ## Arguments
 
-| CLI Flag            | Description                                                 |
-| ------------------- | ----------------------------------------------------------- |
-| `--lecicographic`   | Run the `MOA.Lexicographic` algorithm (default)             |
-| `--epsilon`         | Run the `MOA.EpsilonConstraint` algorithm                   |
-| `--hierarchical`    | Run the `MOA.Hierarchical` algorithm                        |
-| `--dominguez-rios`  | Run the `MOA.DominguezRios` algorithm                       |
-| `--highs`           | Use the HiGHS optimizer as backaend (default)               |
-| `--scip`            | Use the SCIP optimizer as backend                           |
-| `--gurobi`          | Use the Gurobi optimizer as backend                         |
-| `--cplex`           | Use the CPLEX optimizer as backend                          |
-| `--print-model`     | Print the read model before solving                         |
-| `--print-solutions` | Print the found solutions and not just the objective values |
-| `--non-silent`      | Activate output from the solving algorithm                  |
+| CLI Flag            | Description                                                          |
+| ------------------- | -------------------------------------------------------------------- |
+| `--lecicographic`   | Run the `MOA.Lexicographic` algorithm (default)                      |
+| `--epsilon`         | Run the `MOA.EpsilonConstraint` algorithm                            |
+| `--hierarchical`    | Run the `MOA.Hierarchical` algorithm                                 |
+| `--dominguez-rios`  | Run the `MOA.DominguezRios` algorithm                                |
+| `--highs`           | Use the HiGHS optimizer as backaend (default)                        |
+| `--scip`            | Use the SCIP optimizer as backend                                    |
+| `--gurobi`          | Use the Gurobi optimizer as backend                                  |
+| `--cplex`           | Use the CPLEX optimizer as backend                                   |
+| `--print-model`     | Print the read model before solving                                  |
+| `--print-solutions` | Print the found solutions and not just the objective values          |
+| `--non-silent`      | Activate output from the solving algorithm                           |
+| `--threads=n`       | Limit the underlying MIP solver to `n` threads                       |
+| `--tuned`           | Set some options for the underlying MIP solver to tune for exactness |
